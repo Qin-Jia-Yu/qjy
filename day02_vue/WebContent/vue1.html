@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="./js/vue.js"></script>
+</head>
+<body>
+	<div id="app">
+		 姓名：<input type="text" v-model="emp.name"><br>
+		 年龄：<input type="text" v-model="emp.age"><button @click="emp.age++">+</button><button @click="emp.age--">-</button><br>
+		 爱好：<input type="checkbox" v-model="emp.hobby" value="吃鸡">吃鸡
+		 	 <input type="checkbox" v-model="emp.hobby" value="喝酒">喝酒
+		 	 <input type="checkbox" v-model="emp.hobby" value="抽烟">抽烟
+			 <input type="checkbox" v-model="emp.hobby" value="蹦迪">蹦迪<br>
+			 
+		遍历爱好内容：<ul>
+					<li v-for="h in emp.hobby">
+						{{h}}
+					</li>
+				  </ul>
+	</div>
+	<script type="text/javascript">
+		 var app = new Vue({
+			 el:"#app",
+			 data:{
+				 emp:{
+					 name:"秦佳玉",
+					 age:20,
+					 hobby:[]
+				 }
+				 
+			 }
+			 
+		 });
+		 
+	</script>
+</body>
+</html>
