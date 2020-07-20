@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import cn.jiyun.mapper.StudentMapper;
 import cn.jiyun.pojo.Student;
+import cn.jiyun.pojo.StudentVo;
 
 @Service
 public class StudentService {
@@ -14,9 +15,9 @@ public class StudentService {
 	@Autowired
 	private StudentMapper sm;
 
-	public List<Student> findAll() {
+	public List<Student> findAll(StudentVo vo) {
 		// TODO Auto-generated method stub
-		return sm.findAll();
+		return sm.findAll(vo);
 	}
 
 	public List<Class> findClass() {

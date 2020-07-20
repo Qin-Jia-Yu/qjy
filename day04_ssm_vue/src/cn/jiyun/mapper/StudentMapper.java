@@ -2,11 +2,14 @@ package cn.jiyun.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import cn.jiyun.pojo.Student;
+import cn.jiyun.pojo.StudentVo;
 
 public interface StudentMapper {
 
-	List<Student> findAll();
+	List<Student> findAll(StudentVo vo);
 
 	List<Class> findClass();
 
@@ -14,6 +17,6 @@ public interface StudentMapper {
 
 	int updateStu(Student stu);
 
-	int delStu(Integer[] ids);
+	int delStu(@Param("ids") Integer[] ids);
 
 }

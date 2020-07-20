@@ -29,16 +29,15 @@
 			student:{}
 		},
 		created(){
-			 axios.post("${pageContext.request.contextPath }/findClass.action").then(function(res){
+			 axios.post("${pageContext.request.contextPath }/student/findClass.action").then(function(res){
 				 form.clist = res.data;
 			 })
 		},
 		methods:{
 			add(){
-				axios.post("${pageContext.request.contextPath}/addStudent.action",form.student).then(function(){
+				axios.post("${pageContext.request.contextPath}/student/addStudent.action",form.student).then(function(res){
 					if(res.data>0){
-					location.href="${pageContext.request.contextPath}/toShow.action";
-						/* location.href="show.jsp"; */
+						location.href="${pageContext.request.contextPath}/student/toShow.action";
 					}
 				})
 			}

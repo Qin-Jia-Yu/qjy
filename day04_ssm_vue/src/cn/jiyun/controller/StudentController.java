@@ -8,15 +8,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+
 import cn.jiyun.pojo.Student;
+import cn.jiyun.pojo.StudentVo;
 import cn.jiyun.service.StudentService;
 
 @Controller
+@RequestMapping("student")
 public class StudentController {
 
 	@Autowired
 	private StudentService ss;
 
+	
 	@RequestMapping("toShow")
 	public String toShow() {
 
@@ -25,11 +31,15 @@ public class StudentController {
 
 	@RequestMapping("findAll")
 	@ResponseBody
-	public List<Student> findAll() {
+	public PageInfo<Student> findAll(@RequestBody StudentVo vo) {
+		
+		PageHelper.startPage(vo.getPageNum(), 2);
+		
+		List<Student> sList = ss.findAll(vo);
+		
+		PageInfo<Student> page = new PageInfo<>(sList);
 
-		List<Student> sList = ss.findAll();
-
-		return sList;
+		return page;
 	}
 
 	@RequestMapping("toAdd")

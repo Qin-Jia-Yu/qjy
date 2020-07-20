@@ -18,8 +18,16 @@
 </style>
 </head>
 <body>
-<a href="${pageContext.request.contextPath }/toAdd.action">添加</a>
+<a href="${pageContext.request.contextPath }/student/toAdd.action">添加</a>
 <div id="did">
+
+姓名：<input type="text" v-model="student.sname"><br>
+班级：<select v-model="student.cid">
+		<option value="0">==请选择==</option>
+		<option v-for="clazz in clist" :value="clazz.cid" v-text = "clazz.cname"></option>
+	</select><br>
+生日：<input type="date" v-model = "start" >-<input type="date" v-model = "end" ><br/>
+<input type="button" value="查询" @click="jump(1)">
 <table id="tid" border="1" :class="flag2">
 	<tr>
 		<td>选择</td>
@@ -44,6 +52,11 @@
 	</tr>
 	
 </table>
+当前页：{{page.pageNum}}/总页数：{{page.pages}}&nbsp;总条数：{{page.total}}<br>
+<input type="button" value="首页" @click="jump(page.firstPage)">
+<input type="button" value="上一页" @click="jump(page.prePage)">
+<input type="button" value="下一页" @click="jump(page.nextPage)">
+<input type="button" value="尾页" @click="jump(page.lastPage)">
 <input type="button" @click="del" value="删除">
 <!--   -->
 <form id="fid" action="" :class="flag">
@@ -64,17 +77,23 @@
 		el:"#did",
 		data:{
 			slist:[],
-			student:{},
+			student:{
+				cid:0
+			},
 			clist:[],
 			flag:'hidden',
 			flag2:'show',
-			ids:[]
+			ids:[],
+			page:{},
+			start:'',
+			end:''
 		},
 		created(){
-			axios.post("${pageContext.request.contextPath}/findAll.action").then(function(res){
-				table.slist = res.data;
+			axios.post("${pageContext.request.contextPath}/student/findAll.action",{pageNum:1}).then(function(res){
+				table.slist = res.data.list;
+				table.page = res.data;
 			}),
-			axios.post("${pageContext.request.contextPath}/findClass.action").then(function(res){
+			axios.post("${pageContext.request.contextPath}/student/findClass.action").then(function(res){
 				table.clist = res.data;
 			})
 		},
@@ -93,21 +112,27 @@
 				this.flag2="hidden";
 			},
 			update(){
-				axios.post("${pageContext.request.contextPath}/updateStu.action",table.student).then(function(res){
+				axios.post("${pageContext.request.contextPath}/student/updateStu.action",table.student).then(function(res){
 					if(res.data>0){
 						table.flag="hidden";
 						table.flag2="show";
-						 location.href="${pageContext.request.contextPath}/toShow.action" ;
+						 location.href="${pageContext.request.contextPath}/student/toShow.action" ;
 						
 					};
 				})
 			},
 			del(){
-				axios.post("${pageContext.request.contextPath}/delStu.action",this.ids).then(function(res){
+				axios.post("${pageContext.request.contextPath}/student/delStu.action",this.ids).then(function(res){
 					if(res.data>0){
-						 location.href="${pageContext.request.contextPath}/toShow.action" ;
+						 location.href="${pageContext.request.contextPath}/student/toShow.action" ;
 						
 					};
+				})
+			},
+			jump(pageNum){
+				axios.post("${pageContext.request.contextPath}/student/findAll.action",{pageNum:pageNum,sname:this.student.sname,cid:this.student.cid,start:this.start,end:this.end}).then(function(res){
+					table.slist = res.data.list;
+					table.page = res.data;
 				})
 			}
 			
