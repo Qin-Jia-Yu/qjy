@@ -26,6 +26,9 @@ import com.xiaoshu.service.UserService;
 import com.xiaoshu.util.StringUtil;
 import com.xiaoshu.util.WriterUtil;
 
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+
 @Controller
 @RequestMapping("person")
 public class PersonController extends LogController{
@@ -43,6 +46,13 @@ public class PersonController extends LogController{
 	@Autowired
 	private OperationService operationService;
 	
+	@Autowired
+	private JedisPool jedisPool;
+	
+	int page = 0;
+	
+	boolean flag = true;
+	
 	
 	@RequestMapping("personIndex")
 	public String index(HttpServletRequest request,Integer menuid) throws Exception{
@@ -57,16 +67,33 @@ public class PersonController extends LogController{
 	@RequestMapping(value="personList",method=RequestMethod.POST)
 	public void userList(HttpServletRequest request,Person person,HttpServletResponse response,String offset,String limit) throws Exception{
 		try {
-			
+			String sList = null;
 			
 			Integer pageSize = StringUtil.isEmpty(limit)?ConfigUtil.getPageSize():Integer.parseInt(limit);
 			Integer pageNum =  (Integer.parseInt(offset)/pageSize)+1;
-			PageInfo<Person> userList= ps.findUserPage(person,pageNum,pageSize);
+		
+			Jedis jedis = jedisPool.getResource();
+			sList = jedis.get("sList");
 			
-			JSONObject jsonObj = new JSONObject();
-			jsonObj.put("total",userList.getTotal() );
-			jsonObj.put("rows", userList.getList());
-	        WriterUtil.write(response,jsonObj.toString());
+			if(sList!=null && sList!="" && pageNum==page && flag){
+				WriterUtil.write(response,sList);
+			}else{
+				PageInfo<Person> userList= ps.findUserPage(person,pageNum,pageSize);
+				
+				JSONObject jsonObj = new JSONObject();
+				jsonObj.put("total",userList.getTotal() );
+				jsonObj.put("rows", userList.getList());
+				
+				sList = jsonObj.toString();
+				jedis.set("sList", sList);
+				
+				page = pageNum ;
+				flag = true;
+				WriterUtil.write(response,sList);
+				
+			}
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("用户展示错误",e);
@@ -86,6 +113,7 @@ public class PersonController extends LogController{
 				if(userName != null && userName.getId().compareTo(userId)==0||userName==null){
 //					person.setId(userId);
 					ps.updatePerson(person);
+					flag = false;
 					result.put("success", true);
 				}else{
 					result.put("success", true);
@@ -94,6 +122,7 @@ public class PersonController extends LogController{
 			}else {   // 添加
 				if(ps.existUserWithUserName(person.getpName())==null){  // 没有重复可以添加
 					ps.addPerson(person);
+					flag = false;
 					result.put("success", true);
 				} else {
 					result.put("success", true);
@@ -119,6 +148,7 @@ public class PersonController extends LogController{
 				ps.deletePerson(Integer.parseInt(id));
 			}
 			result.put("success", true);
+			flag = false;
 			result.put("delNums", ids.length);
 		} catch (Exception e) {
 			e.printStackTrace();
