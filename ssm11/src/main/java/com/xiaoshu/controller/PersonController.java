@@ -53,7 +53,7 @@ public class PersonController extends LogController{
 	
 	boolean flag = true;
 	
-	
+	//专业展示
 	@RequestMapping("personIndex")
 	public String index(HttpServletRequest request,Integer menuid) throws Exception{
 		List<Company> roleList = ps.findCompany();
@@ -63,7 +63,7 @@ public class PersonController extends LogController{
 		return "person";
 	}
 	
-	
+	//展示
 	@RequestMapping(value="personList",method=RequestMethod.POST)
 	public void userList(HttpServletRequest request,Person person,HttpServletResponse response,String offset,String limit) throws Exception{
 		try {
@@ -138,7 +138,7 @@ public class PersonController extends LogController{
 		WriterUtil.write(response, result.toString());
 	}
 	
-	
+	//删除
 	@RequestMapping("deletePerson")
 	public void delUser(HttpServletRequest request,HttpServletResponse response){
 		JSONObject result=new JSONObject();
